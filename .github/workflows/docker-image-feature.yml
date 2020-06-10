@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: test ls
         run: echo '::set-env name=LS_VALUE::$(ls -a)'
-      - name: Test setting test version
-        run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
+      # - name: Test setting test version
+      #   run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
       - name: test echoing target version
         run: echo $LS_VALUE
       # - name: Build the docker image (robot based)
