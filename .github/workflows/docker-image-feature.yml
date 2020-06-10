@@ -11,13 +11,14 @@ jobs:
     env:
       BASE_IMAGE: "ros:melodic-robot"
       ARCH: x86
-      TEST_VERSION: $(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)
       TARGET_TYPE: robot
       TARGET_VERSION: feature
       IMAGE_NAME: sonia_messages
       GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
     steps:
       - uses: actions/checkout@v2
+      - name: Test setting test version
+        run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
       - name: test echoing target version
         run: echo $TEST_VERSION
       # - name: Build the docker image (robot based)
