@@ -17,6 +17,8 @@ jobs:
       GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
     steps:
       - uses: actions/checkout@v2
+      - name: test ls
+        run: echo $(ls -a)
       - name: Test setting test version
         run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
       - name: test echoing target version
