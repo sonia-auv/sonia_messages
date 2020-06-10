@@ -17,6 +17,10 @@ jobs:
       GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
     steps:
       - uses: actions/checkout@v2
+      - name: Test setting test version
+        run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
+      - name: test echoing target version
+        run: echo '${TEST_VERSION}'
       - name: Build the docker image (robot based)
         run: |
           docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
