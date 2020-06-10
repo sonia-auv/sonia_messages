@@ -11,14 +11,13 @@ jobs:
     env:
       BASE_IMAGE: "ros:melodic-robot"
       ARCH: x86
+      TEST_VERSION: $(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)
       TARGET_TYPE: robot
       TARGET_VERSION: feature
       IMAGE_NAME: sonia_messages
       GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
     steps:
       - uses: actions/checkout@v2
-      - name: Test setting test version
-        run: echo '::set-env name=TEST_VERSION::$(sed -n -e 's/.*<version>\(.*\)<\/version>.*/\1/p' package.xml)'
       - name: test echoing target version
         run: echo '${TEST_VERSION}'
       - name: Build the docker image (robot based)
@@ -37,179 +36,179 @@ jobs:
         run: |
           docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-  build-ros-robot-arm64:
-    name: "Build ROS robot ARM64"
-    runs-on: ubuntu-latest
-    env:
-      BASE_IMAGE: "ros:melodic-robot"
-      ARCH: arm64
-      TARGET_TYPE: robot
-      TARGET_VERSION: feature
-      IMAGE_NAME: sonia_messages
-      GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Enable Docker Daemon Experimental Features
-        run: |
-          sudo rm /etc/docker/daemon.json
-          echo '{"experimental": true , "cgroup-parent": "/actions_job" }' | sudo tee -a /etc/docker/daemon.json
-          sudo service docker restart
-          docker version
+  # build-ros-robot-arm64:
+  #   name: "Build ROS robot ARM64"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BASE_IMAGE: "ros:melodic-robot"
+  #     ARCH: arm64
+  #     TARGET_TYPE: robot
+  #     TARGET_VERSION: feature
+  #     IMAGE_NAME: sonia_messages
+  #     GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Enable Docker Daemon Experimental Features
+  #       run: |
+  #         sudo rm /etc/docker/daemon.json
+  #         echo '{"experimental": true , "cgroup-parent": "/actions_job" }' | sudo tee -a /etc/docker/daemon.json
+  #         sudo service docker restart
+  #         docker version
 
-      - name: Install QEMU to be able to compile on X86 into ARM64
-        run: |
-          sudo apt-get install qemu binfmt-support qemu-user-static
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  #     - name: Install QEMU to be able to compile on X86 into ARM64
+  #       run: |
+  #         sudo apt-get install qemu binfmt-support qemu-user-static
+  #         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Build the docker image (robot based)
-        run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
+  #     - name: Build the docker image (robot based)
+  #       run: |
+  #         docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
 
-      - name: Login to Github Package Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #     - name: Login to Github Package Registry
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Create Docker Image Tag
-        run: |
-          docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Create Docker Image Tag
+  #       run: |
+  #         docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-      - name: Push Image to Github Packages Registry
-        run: |
-          docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Push Image to Github Packages Registry
+  #       run: |
+  #         docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-  build-ros-robot-l4t-arm64:
-    name: "Build ROS robot L4T ARM64 (NVIDIA XAVIER)"
-    runs-on: ubuntu-latest
-    env:
-      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-robot-develop"
-      ARCH: arm64
-      TARGET_TYPE: robot-l4t
-      TARGET_VERSION: feature
-      IMAGE_NAME: sonia_messages
-      GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install QEMU to be able to compile on X86 into ARM64
-        run: |
-          sudo apt-get install qemu binfmt-support qemu-user-static
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  # build-ros-robot-l4t-arm64:
+  #   name: "Build ROS robot L4T ARM64 (NVIDIA XAVIER)"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-robot-develop"
+  #     ARCH: arm64
+  #     TARGET_TYPE: robot-l4t
+  #     TARGET_VERSION: feature
+  #     IMAGE_NAME: sonia_messages
+  #     GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install QEMU to be able to compile on X86 into ARM64
+  #       run: |
+  #         sudo apt-get install qemu binfmt-support qemu-user-static
+  #         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Login to Github Package Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #     - name: Login to Github Package Registry
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Build the docker image (robot based)
-        run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BASE_IMAGE=${BASE_IMAGE}
+  #     - name: Build the docker image (robot based)
+  #       run: |
+  #         docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BASE_IMAGE=${BASE_IMAGE}
 
-      - name: Create Docker Image Tag
-        run: |
-          docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Create Docker Image Tag
+  #       run: |
+  #         docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-      - name: Push Image to Github Packages Registry
-        run: |
-          docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}
+  #     - name: Push Image to Github Packages Registry
+  #       run: |
+  #         docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}
 
-  build-ros-perception-x86-64:
-    name: "Build ROS perception X86/64"
-    runs-on: ubuntu-latest
-    env:
-      BASE_IMAGE: "ros:melodic-perception"
-      ARCH: x86
-      TARGET_TYPE: perception
-      TARGET_VERSION: feature
-      IMAGE_NAME: sonia_messages
-      GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build the docker image (perception based)
-        run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
+  # build-ros-perception-x86-64:
+  #   name: "Build ROS perception X86/64"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BASE_IMAGE: "ros:melodic-perception"
+  #     ARCH: x86
+  #     TARGET_TYPE: perception
+  #     TARGET_VERSION: feature
+  #     IMAGE_NAME: sonia_messages
+  #     GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Build the docker image (perception based)
+  #       run: |
+  #         docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
 
-      - name: Login to Github Package Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #     - name: Login to Github Package Registry
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Create Docker Image Tag
-        run: |
-          docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Create Docker Image Tag
+  #       run: |
+  #         docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-      - name: Push Image to Github Packages Registry
-        run: |
-          docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Push Image to Github Packages Registry
+  #       run: |
+  #         docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-  build-ros-perception-arm64:
-    name: "Build ROS perception AMR64"
-    runs-on: ubuntu-latest
-    env:
-      BASE_IMAGE: "ros:melodic-perception"
-      ARCH: arm64
-      TARGET_TYPE: perception
-      TARGET_VERSION: feature
-      IMAGE_NAME: sonia_messages
-      GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Enable Docker Daemon Experimental Features
-        run: |
-          sudo rm /etc/docker/daemon.json
-          echo '{"experimental": true , "cgroup-parent": "/actions_job" }' | sudo tee -a /etc/docker/daemon.json
-          sudo service docker restart
-          docker version
+  # build-ros-perception-arm64:
+  #   name: "Build ROS perception AMR64"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BASE_IMAGE: "ros:melodic-perception"
+  #     ARCH: arm64
+  #     TARGET_TYPE: perception
+  #     TARGET_VERSION: feature
+  #     IMAGE_NAME: sonia_messages
+  #     GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Enable Docker Daemon Experimental Features
+  #       run: |
+  #         sudo rm /etc/docker/daemon.json
+  #         echo '{"experimental": true , "cgroup-parent": "/actions_job" }' | sudo tee -a /etc/docker/daemon.json
+  #         sudo service docker restart
+  #         docker version
 
-      - name: Install QEMU to be able to compile on X86 into ARM64
-        run: |
-          sudo apt-get install qemu binfmt-support qemu-user-static
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  #     - name: Install QEMU to be able to compile on X86 into ARM64
+  #       run: |
+  #         sudo apt-get install qemu binfmt-support qemu-user-static
+  #         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Build the docker image (perception based)
-        run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
+  #     - name: Build the docker image (perception based)
+  #       run: |
+  #         docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
 
-      - name: Login to Github Package Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #     - name: Login to Github Package Registry
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Create Docker Image Tag
-        run: |
-          docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Create Docker Image Tag
+  #       run: |
+  #         docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-      - name: Push Image to Github Packages Registry
-        run: |
-          docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Push Image to Github Packages Registry
+  #       run: |
+  #         docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-  build-ros-perception-l4t-arm64:
-    name: "Build ROS perception L4T ARM64 (NVIDIA XAVIER)"
-    runs-on: ubuntu-latest
-    env:
-      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-perception-develop"
-      ARCH: arm64
-      TARGET_TYPE: perception-l4t
-      TARGET_VERSION: feature
-      IMAGE_NAME: sonia_messages
-      GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install QEMU to be able to compile on X86 into ARM64
-        run: |
-          sudo apt-get install qemu binfmt-support qemu-user-static
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  # build-ros-perception-l4t-arm64:
+  #   name: "Build ROS perception L4T ARM64 (NVIDIA XAVIER)"
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-perception-develop"
+  #     ARCH: arm64
+  #     TARGET_TYPE: perception-l4t
+  #     TARGET_VERSION: feature
+  #     IMAGE_NAME: sonia_messages
+  #     GITHUB_REMOTE_URL: docker.pkg.github.com/${{ github.repository }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install QEMU to be able to compile on X86 into ARM64
+  #       run: |
+  #         sudo apt-get install qemu binfmt-support qemu-user-static
+  #         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-      - name: Login to Github Package Registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+  #     - name: Login to Github Package Registry
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
-      - name: Build the docker image (perception based)
-        run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BASE_IMAGE=${BASE_IMAGE}
+  #     - name: Build the docker image (perception based)
+  #       run: |
+  #         docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BASE_IMAGE=${BASE_IMAGE}
 
-      - name: Create Docker Image Tag
-        run: |
-          docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
+  #     - name: Create Docker Image Tag
+  #       run: |
+  #         docker tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} ${GITHUB_REMOTE_URL}/${IMAGE_NAME}:${ARCH}-${TARGET_TYPE}-${TARGET_VERSION}-${GITHUB_REF##*/}
 
-      - name: Push Image to Github Packages Registry
-        run: |
-          docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}
+  #     - name: Push Image to Github Packages Registry
+  #       run: |
+  #         docker push ${GITHUB_REMOTE_URL}/${IMAGE_NAME}
 
   notify-success:
     name: "Notify Slack - Success"
