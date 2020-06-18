@@ -1,11 +1,11 @@
-# SONIA MSGS
+# SONIA MESSAGES
 
 SONIA'S custom ROS messages package, containing all custom messages developed to work along with our custom ROS modules
 
-![Docker Image CI - Master Branch](https://github.com/sonia-auv/sonia_msgs/workflows/Docker%20Image%20CI%20-%20Master%20Branch/badge.svg)
-![Docker Image CI - Develop Branch](https://github.com/sonia-auv/sonia_msgs/workflows/Docker%20Image%20CI%20-%20Develop%20Branch/badge.svg?branch=develop)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/sonia-auv/sonia_msgs)
-![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/sonia-auv/sonia_msgs.svg)
+![Docker Image CI - Master Branch](https://github.com/sonia-auv/sonia_messages/workflows/Docker%20Image%20CI%20-%20Master%20Branch/badge.svg)
+![Docker Image CI - Develop Branch](https://github.com/sonia-auv/sonia_messages/workflows/Docker%20Image%20CI%20-%20Develop%20Branch/badge.svg?branch=develop)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/sonia-auv/sonia_messages)
+![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/sonia-auv/sonia_messages.svg)
 
 
 ## Getting Started
@@ -14,7 +14,7 @@ SONIA'S custom ROS messages package, containing all custom messages developed to
 Project can be cloned locally as an individual package, it can be done using the following command:
 
 ```bash
-git clone git@github.com:sonia-auv/sonia-cli.git
+git clone git@github.com:sonia-auv/sonia_messages.git
 ```
 
 It is also possible to install the whole AUV-environment using the [auv-env-setup](https://github.com/sonia-auv/auv-env-setup) package
