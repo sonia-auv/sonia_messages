@@ -21,8 +21,8 @@ jobs:
 
       - name: Build the docker image (robot based)
         run: |
-          docker build . --tag build-${TARGET_VERSION}-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
-      
+          docker build . --tag build-${TARGET_VERSION}-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '+%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
+
       - name: Run Module Unit Test
         run: |
           docker run build-${TARGET_VERSION}-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} catkin_make run_tests
@@ -94,7 +94,7 @@ jobs:
     name: "Build ROS robot L4T ARM64 (NVIDIA XAVIER)"
     runs-on: ubuntu-latest
     env:
-      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-robot-develop"
+      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-robot-latest"
       ARCH: arm64
       TARGET_TYPE: robot-l4t
       IMAGE_NAME: sonia_messages
@@ -219,7 +219,7 @@ jobs:
     name: "Build ROS perception L4T ARM64 (NVIDIA XAVIER)"
     runs-on: ubuntu-latest
     env:
-      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-perception-develop"
+      BASE_IMAGE: "docker.pkg.github.com/sonia-auv/l4t-ros-base/l4t_ros_base:arm64-perception-latest"
       ARCH: arm64
       TARGET_TYPE: perception-l4t
       IMAGE_NAME: sonia_messages
@@ -233,7 +233,7 @@ jobs:
         run: |
           sudo apt-get install qemu binfmt-support qemu-user-static
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-        
+
       - name: Login to Github Package Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -259,7 +259,8 @@ jobs:
   notify-success:
     name: "Notify Slack - Success"
     runs-on: ubuntu-latest
-    needs: [
+    needs:
+      [
         build-ros-robot-x86-64,
         build-ros-robot-arm64,
         build-ros-robot-l4t-arm64,
@@ -281,7 +282,8 @@ jobs:
   notify-fail:
     name: "Notify Slack - Failure"
     runs-on: ubuntu-latest
-    needs: [
+    needs:
+      [
         build-ros-robot-x86-64,
         build-ros-robot-arm64,
         build-ros-robot-l4t-arm64,
