@@ -20,6 +20,9 @@ ENV SONIA_HOME=/home/${SONIA_USER}
 ENV SONIA_UID=${SONIA_UID}
 ENV ROS_WS_SETUP=/opt/ros/${ROS_DISTRO}/setup.bash
 
+## ADD EXTRA DEPENDENCIES
+RUN apt-get update && apt-get install -y libyaml-cpp-dev
+
 ## ENV FOR BASE LIB
 ENV BASE_LIB_WS=${SONIA_HOME}/base_lib_ws
 ENV BASE_LIB_WS_SETUP=${BASE_LIB_WS}/devel/setup.bash
