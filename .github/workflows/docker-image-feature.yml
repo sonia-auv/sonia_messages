@@ -60,7 +60,6 @@ jobs:
       - name: Build the docker image (robot based)
         run: |
           docker build . --platform arm --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
-          docker inspect build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER}
 
       - name: Login to Github Package Registry
         run: |
@@ -161,7 +160,7 @@ jobs:
 
       - name: Build the docker image (perception based)
         run: |
-          docker build . --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
+          docker build . --platform arm --tag build-feature-${GITHUB_REF##*/}-${GITHUB_RUN_NUMBER} --build-arg BUILD_DATE=$(date '+%Y-%m-%d_%H:%M:%S') --build-arg VERSION=${GITHUB_REF##*/}-$(date '  +%Y-%m-%d_%H:%M:%S') --build-arg BASE_IMAGE=${BASE_IMAGE}
 
       - name: Login to Github Package Registry
         run: |
