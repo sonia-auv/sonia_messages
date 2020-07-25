@@ -36,7 +36,7 @@ RUN useradd --uid ${SONIA_UID} --create-home ${SONIA_USER}
 
 ## Adding support for vscode extension volume caching
 RUN mkdir -p ${SONIA_HOME}/.vscode-server/extensions \
-    && chown -R ${SONIA_USER} ${SONIA_HOME}/.vscode-server
+    && chown -R ${SONIA_USER}: ${SONIA_HOME}/.vscode-server
 
 WORKDIR ${BASE_LIB_WS}
 
